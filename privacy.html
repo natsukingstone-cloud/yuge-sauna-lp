@@ -132,42 +132,26 @@
     (function () {
       var backBtn = document.getElementById('docBackBtn');
       var headerBack = document.querySelector('.doc-header-back');
-
-      // referrerがあれば「前のページから来た」と判定
-      var cameFromLP = document.referrer && document.referrer.indexOf('index.html') !== -1;
-      // または同じオリジンからなら前のページに戻れる
-      var hasHistory = document.referrer && document.referrer.indexOf(window.location.origin) !== -1;
+      var fromForm = window.location.search.indexOf("from=form") !== -1;
 
       function goBack(e) {
         if (e) e.preventDefault();
-
-        if (hasHistory) {
-          // 同じタブで遷移してきた場合 → 戻る
-          window.history.back();
-        } else {
-          // 新しいタブで開かれた場合 → タブを閉じる試行
+        if (fromForm) {
           window.close();
-          // モバイルではwindow.closeが効かないのでフォールバック
           setTimeout(function () {
             window.location.href = 'index.html#reserve';
           }, 200);
+        } else {
+          window.history.back();
         }
       }
 
-      // ボタンテキストをモバイル向けに調整
       if (backBtn) {
-        if (!hasHistory) {
-          backBtn.textContent = '予約画面に戻る';
-        }
+        backBtn.textContent = fromForm ? '予約画面に戻る' : '← 前のページに戻る';
         backBtn.addEventListener('click', goBack);
       }
-
       if (headerBack) {
-        if (!hasHistory) {
-          headerBack.textContent = '予約画面に戻る';
-        } else {
-          headerBack.textContent = '← 前のページに戻る';
-        }
+        headerBack.textContent = fromForm ? '予約画面に戻る' : '← 前のページに戻る';
         headerBack.addEventListener('click', goBack);
       }
     })();
