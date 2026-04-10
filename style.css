@@ -1795,11 +1795,11 @@ footer {
 }
 
 .terms-card--bonus {
-  border-left-color: var(--sage);
+  border-left-color: var(--sage-pale);
 }
 
 .terms-card--caution {
-  border-left-color: var(--stone);
+  border-left-color: var(--sage-pale);
 }
 
 .terms-icon {
@@ -1815,11 +1815,11 @@ footer {
 }
 
 .terms-card--bonus .terms-icon {
-  color: var(--moss);
+  color: var(--sage);
 }
 
 .terms-card--caution .terms-icon {
-  color: var(--stone-dark);
+  color: var(--sage);
 }
 
 .terms-card h3 {
@@ -1873,7 +1873,7 @@ footer {
 }
 
 .terms-card--caution .terms-list li::before {
-  color: var(--stone-dark);
+  color: var(--sage);
 }
 
 

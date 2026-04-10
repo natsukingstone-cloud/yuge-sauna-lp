@@ -130,43 +130,45 @@
 
   <script>
     (function () {
-      function goBack() {
-        // 新しいタブで開かれた場合はタブを閉じる試行
-        if (window.history.length <= 1) {
-          window.close();
-          // window.closeが効かない場合のフォールバック
-          setTimeout(function () {
-            window.location.href = 'index.html#reserve';
-          }, 100);
-        } else {
-          window.history.back();
-        }
-      }
-
       var backBtn = document.getElementById('docBackBtn');
       var headerBack = document.querySelector('.doc-header-back');
 
-      // 新しいタブで開かれた判定
-      var isNewTab = window.history.length <= 1;
+      // referrerがあれば「前のページから来た」と判定
+      var cameFromLP = document.referrer && document.referrer.indexOf('index.html') !== -1;
+      // または同じオリジンからなら前のページに戻れる
+      var hasHistory = document.referrer && document.referrer.indexOf(window.location.origin) !== -1;
 
-      if (backBtn) {
-        if (isNewTab) {
-          backBtn.textContent = '✕ 閉じて予約画面に戻る';
+      function goBack(e) {
+        if (e) e.preventDefault();
+
+        if (hasHistory) {
+          // 同じタブで遷移してきた場合 → 戻る
+          window.history.back();
+        } else {
+          // 新しいタブで開かれた場合 → タブを閉じる試行
+          window.close();
+          // モバイルではwindow.closeが効かないのでフォールバック
+          setTimeout(function () {
+            window.location.href = 'index.html#reserve';
+          }, 200);
         }
-        backBtn.addEventListener('click', function (e) {
-          e.preventDefault();
-          goBack();
-        });
+      }
+
+      // ボタンテキストをモバイル向けに調整
+      if (backBtn) {
+        if (!hasHistory) {
+          backBtn.textContent = '予約画面に戻る';
+        }
+        backBtn.addEventListener('click', goBack);
       }
 
       if (headerBack) {
-        if (isNewTab) {
-          headerBack.textContent = '✕ 閉じる';
+        if (!hasHistory) {
+          headerBack.textContent = '予約画面に戻る';
+        } else {
+          headerBack.textContent = '← 前のページに戻る';
         }
-        headerBack.addEventListener('click', function (e) {
-          e.preventDefault();
-          goBack();
-        });
+        headerBack.addEventListener('click', goBack);
       }
     })();
   </script>
