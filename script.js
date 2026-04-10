@@ -10,13 +10,29 @@
      gas-code.gs をGoogle Apps Scriptにデプロイ後、
      発行されたURLをここに貼り付けてください
      ============================================================ */
-  var GAS_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbz6q6C34ev7zgQyFmOsi_Fp0AsWRsFoBAmDXPncPBaCw5pQ2EwF4u5T9KYF0lqC4_J3Dg/exec';
 
 
   document.addEventListener('DOMContentLoaded', init);
 
   /* 予約空き情報のキャッシュ */
   var availabilityCache = null;
+
+  /* スクロール位置の記録 */
+  var savedScrollY = 0;
+
+  /* iOS Safari対応のスクロールロック */
+  function lockBodyScroll() {
+    savedScrollY = window.scrollY;
+    document.body.classList.add('is-modal-open');
+    document.body.style.top = '-' + savedScrollY + 'px';
+  }
+
+  function unlockBodyScroll() {
+    document.body.classList.remove('is-modal-open');
+    document.body.style.top = '';
+    window.scrollTo(0, savedScrollY);
+  }
 
   function init() {
     setupScrollReveal();
@@ -133,7 +149,7 @@
 
       modal.classList.add('is-open');
       modal.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
+      lockBodyScroll();
 
       // 空き状況を先読み（バックグラウンドで取得）
       fetchAvailability();
@@ -157,7 +173,7 @@
     function closeModal() {
       modal.classList.remove('is-open');
       modal.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
+      unlockBodyScroll();
 
       // 成功画面を閉じたらフォームに戻す
       var formView = document.getElementById('modalFormView');
@@ -208,7 +224,7 @@
           e.preventDefault();
           modal.classList.add('is-open');
           modal.setAttribute('aria-hidden', 'false');
-          document.body.style.overflow = 'hidden';
+          lockBodyScroll();
           // スクロール位置を一番上に
           var content = modal.querySelector('.modal-content');
           if (content) content.scrollTop = 0;
@@ -223,7 +239,7 @@
         if (modal) {
           modal.classList.remove('is-open');
           modal.setAttribute('aria-hidden', 'true');
-          document.body.style.overflow = '';
+          unlockBodyScroll();
         }
       });
     });
@@ -234,7 +250,7 @@
       document.querySelectorAll('.modal--doc.is-open').forEach(function (modal) {
         modal.classList.remove('is-open');
         modal.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
+        unlockBodyScroll();
       });
     });
   }
@@ -452,9 +468,23 @@
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      // 簡易バリデーション
+      // バリデーション（モーダル内スクロール対応）
       if (!form.checkValidity()) {
-        form.reportValidity();
+        // 最初の無効な要素を見つけてモーダル内でスクロール
+        var firstInvalid = form.querySelector(':invalid');
+        if (firstInvalid) {
+          // モーダル要素を取得
+          var modal = form.closest('.modal');
+          if (modal) {
+            // モーダル内でスクロール（背景ではなくモーダルを動かす）
+            var rect = firstInvalid.getBoundingClientRect();
+            var modalRect = modal.getBoundingClientRect();
+            var scrollTarget = modal.scrollTop + (rect.top - modalRect.top) - 100;
+            modal.scrollTo({ top: Math.max(0, scrollTarget), behavior: 'smooth' });
+          }
+          // ネイティブのバリデーションメッセージを表示
+          firstInvalid.reportValidity();
+        }
         return;
       }
 
