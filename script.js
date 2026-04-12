@@ -10,7 +10,7 @@
      gas-code.gs をGoogle Apps Scriptにデプロイ後、
      発行されたURLをここに貼り付けてください
      ============================================================ */
-  var GAS_URL = 'https://script.google.com/macros/s/AKfycbz6q6C34ev7zgQyFmOsi_Fp0AsWRsFoBAmDXPncPBaCw5pQ2EwF4u5T9KYF0lqC4_J3Dg/exec';
+  var GAS_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
 
   document.addEventListener('DOMContentLoaded', init);
@@ -44,6 +44,28 @@
     setupDateMin();
     setupAvailabilityCheck();
     setupPlanGenderSwitch();
+    setupHeroSlideshow();
+  }
+
+
+  /* ----------------------------------------------------------
+     ヒーロー画像スライドショー（クロスフェード）
+     ---------------------------------------------------------- */
+  function setupHeroSlideshow() {
+    var slides = document.querySelectorAll('.hero-slide');
+    if (slides.length < 2) return;
+
+    // prefers-reduced-motion を尊重
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var currentIndex = 0;
+    var INTERVAL = 6000; // 6秒ごとに切り替え
+
+    setInterval(function () {
+      slides[currentIndex].classList.remove('is-active');
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides[currentIndex].classList.add('is-active');
+    }, INTERVAL);
   }
 
 
@@ -100,7 +122,7 @@
      フローティング予約ボタン（ヒーローを過ぎたら表示）
      ---------------------------------------------------------- */
   function setupFloatingButton() {
-    var btn = document.querySelector('.floating-reserve');
+    var btn = document.querySelector('.floating-ctas');
     var hero = document.querySelector('.hero');
     if (!btn || !hero) return;
 
@@ -151,6 +173,11 @@
       modal.setAttribute('aria-hidden', 'false');
       lockBodyScroll();
 
+      // 履歴にstateを追加（Androidの戻るボタンでモーダルを閉じる）
+      if (!window.history.state || !window.history.state.modalOpen) {
+        window.history.pushState({ modalOpen: true }, '');
+      }
+
       // 空き状況を先読み（バックグラウンドで取得）
       fetchAvailability();
 
@@ -170,10 +197,15 @@
       }, 300);
     }
 
-    function closeModal() {
+    function closeModal(skipHistory) {
       modal.classList.remove('is-open');
       modal.setAttribute('aria-hidden', 'true');
       unlockBodyScroll();
+
+      // 履歴stateを戻す（ユーザークリックによるクローズ時のみ）
+      if (!skipHistory && window.history.state && window.history.state.modalOpen) {
+        window.history.back();
+      }
 
       // 成功画面を閉じたらフォームに戻す
       var formView = document.getElementById('modalFormView');
@@ -193,13 +225,20 @@
     });
 
     closeBtns.forEach(function (btn) {
-      btn.addEventListener('click', closeModal);
+      btn.addEventListener('click', function () { closeModal(false); });
+    });
+
+    // ブラウザの戻るボタン（Androidのシステム戻るも含む）でモーダルを閉じる
+    window.addEventListener('popstate', function (e) {
+      if (modal.classList.contains('is-open')) {
+        closeModal(true); // history操作せずにモーダルだけ閉じる
+      }
     });
 
     // ESCキーで閉じる
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape' && modal.classList.contains('is-open')) {
-        closeModal();
+        closeModal(false);
       }
     });
   }
