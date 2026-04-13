@@ -928,6 +928,15 @@
             <label for="form-agree"><a href="privacy.html?from=form" target="_blank" rel="noopener">プライバシーポリシー</a>および上記キャンセルポリシーに同意します <span class="req">*</span></label>
           </div>
 
+          <!-- バリデーションエラー一覧表示エリア -->
+          <div class="form-errors" id="formErrors" hidden role="alert" aria-live="polite">
+            <p class="form-errors-title">
+              <span class="form-errors-icon" aria-hidden="true">!</span>
+              入力内容をご確認ください
+            </p>
+            <ul class="form-errors-list" id="formErrorsList"></ul>
+          </div>
+
           <button type="submit" class="form-submit">仮予約を申し込む</button>
           <p class="form-note">※ 送信後、ご入力のメールアドレス宛に受付完了メールが届きます。スタッフが内容を確認後、予約確定のご連絡をいたします。<br>※ お急ぎの方はお電話でのご予約も承ります: <a href="tel:0312345678">03-1234-5678</a></p>
         </form>

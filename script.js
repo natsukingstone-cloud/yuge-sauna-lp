@@ -10,7 +10,7 @@
      gas-code.gs をGoogle Apps Scriptにデプロイ後、
      発行されたURLをここに貼り付けてください
      ============================================================ */
-  var GAS_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbz6q6C34ev7zgQyFmOsi_Fp0AsWRsFoBAmDXPncPBaCw5pQ2EwF4u5T9KYF0lqC4_J3Dg/exec';
 
 
   document.addEventListener('DOMContentLoaded', init);
@@ -534,25 +534,51 @@
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      // バリデーション（モーダル内スクロール対応）
-      if (!form.checkValidity()) {
-        // 最初の無効な要素を見つけてモーダル内でスクロール
-        var firstInvalid = form.querySelector(':invalid');
-        if (firstInvalid) {
-          // モーダル要素を取得
-          var modal = form.closest('.modal');
-          if (modal) {
-            // モーダル内でスクロール（背景ではなくモーダルを動かす）
-            var rect = firstInvalid.getBoundingClientRect();
+      // カスタムバリデーション: 全エラーを一括表示
+      var errorsBox = document.getElementById('formErrors');
+      var errorsList = document.getElementById('formErrorsList');
+
+      // 前回のエラー表示をクリア
+      form.querySelectorAll('.form-group.has-error').forEach(function (el) {
+        el.classList.remove('has-error');
+      });
+
+      // エラーをチェック
+      var errors = [];
+      var invalidFields = form.querySelectorAll(':invalid');
+
+      invalidFields.forEach(function (field) {
+        var label = getFieldLabel(field);
+        var message = getErrorMessage(field, label);
+        errors.push(message);
+
+        // 該当のform-groupにhas-errorクラスを付与
+        var group = field.closest('.form-group') || field.closest('.form-check');
+        if (group) group.classList.add('has-error');
+      });
+
+      if (errors.length > 0) {
+        // エラーボックスに一覧を表示
+        errorsList.innerHTML = errors.map(function (msg) {
+          return '<li>' + escapeHtml(msg) + '</li>';
+        }).join('');
+        errorsBox.hidden = false;
+
+        // モーダル内でエラーボックスまでスクロール
+        var modal = form.closest('.modal');
+        if (modal) {
+          setTimeout(function () {
+            var rect = errorsBox.getBoundingClientRect();
             var modalRect = modal.getBoundingClientRect();
-            var scrollTarget = modal.scrollTop + (rect.top - modalRect.top) - 100;
+            var scrollTarget = modal.scrollTop + (rect.top - modalRect.top) - 80;
             modal.scrollTo({ top: Math.max(0, scrollTarget), behavior: 'smooth' });
-          }
-          // ネイティブのバリデーションメッセージを表示
-          firstInvalid.reportValidity();
+          }, 100);
         }
         return;
       }
+
+      // エラーがなければエラーボックスを隠す
+      errorsBox.hidden = true;
 
       var submitBtn = form.querySelector('.form-submit');
       submitBtn.disabled = true;
@@ -583,6 +609,68 @@
         submitBtn.textContent = '仮予約を申し込む';
       });
     });
+  }
+
+
+  /* ----------------------------------------------------------
+     バリデーションエラー用のヘルパー
+     ---------------------------------------------------------- */
+  function getFieldLabel(field) {
+    // ラジオボタンの場合は、グループのラベル
+    if (field.type === 'radio') {
+      var label = field.closest('.form-group');
+      if (label) {
+        var labelEl = label.querySelector('.form-label-block');
+        if (labelEl) return labelEl.textContent.replace('*', '').trim();
+      }
+      return 'ご利用エリア';
+    }
+
+    // チェックボックスの場合
+    if (field.type === 'checkbox') {
+      return '同意事項';
+    }
+
+    // 通常のinput/select/textarea
+    var label = document.querySelector('label[for="' + field.id + '"]');
+    if (label) {
+      return label.textContent.replace('*', '').trim();
+    }
+    return field.name || '項目';
+  }
+
+  function getErrorMessage(field, label) {
+    if (field.validity.valueMissing) {
+      if (field.type === 'checkbox') {
+        return 'プライバシーポリシーおよびキャンセルポリシーへの同意が必要です';
+      }
+      if (field.type === 'radio') {
+        return 'ご利用エリア（男性/女性など）を選択してください';
+      }
+      return label + 'を入力してください';
+    }
+    if (field.validity.typeMismatch) {
+      if (field.type === 'email') {
+        return '正しいメールアドレスの形式で入力してください';
+      }
+      if (field.type === 'tel') {
+        return '正しい電話番号の形式で入力してください';
+      }
+      return label + 'の形式が正しくありません';
+    }
+    if (field.validity.patternMismatch) {
+      return label + 'の形式が正しくありません';
+    }
+    return label + 'を確認してください';
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 
 

@@ -1406,6 +1406,13 @@ footer {
   pointer-events: auto;
 }
 
+/* モーダルが開いている時はフローティングCTAを隠す */
+body.is-modal-open .floating-ctas {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translateY(130%) !important;
+}
+
 .floating-reserve,
 .floating-line {
   flex: 1 1 0;
@@ -1882,21 +1889,21 @@ body.is-modal-open {
 
 /* 大きな画像のパララックス的フェードイン/アウト */
 .rv-img {
-  opacity: 0.3;
-  transform: scale(1.05);
-  transition: opacity 1.2s cubic-bezier(0.23, 1, 0.32, 1),
-              transform 1.6s cubic-bezier(0.23, 1, 0.32, 1);
+  opacity: 0.05;
+  transform: scale(1.15) translateY(40px);
+  transition: opacity 1s cubic-bezier(0.23, 1, 0.32, 1),
+              transform 1.4s cubic-bezier(0.23, 1, 0.32, 1);
   will-change: opacity, transform;
 }
 
 .rv-img.on {
   opacity: 1;
-  transform: scale(1);
+  transform: scale(1) translateY(0);
 }
 
 .rv-img.leaving {
-  opacity: 0.35;
-  transform: scale(1.02);
+  opacity: 0.1;
+  transform: scale(1.1) translateY(-30px);
 }
 
 /* 画像内の<img>タグへの適用 */
@@ -2376,6 +2383,80 @@ body.is-modal-open {
 .form-policy-list li strong {
   font-weight: 500;
   color: var(--moss);
+}
+
+
+/* ==========================================================
+   24g. FORM ERROR SUMMARY
+   ========================================================== */
+.form-errors {
+  background: #FBEEEA;
+  border-left: 3px solid #C47865;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1rem;
+  animation: fadeUp 0.35s ease-out;
+}
+
+.form-errors-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--ff-display);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #8A4A3A;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px dashed rgba(196, 120, 101, 0.35);
+}
+
+.form-errors-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: #C47865;
+  color: #FFFFFF;
+  border-radius: 50%;
+  font-size: 0.72rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.form-errors-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.form-errors-list li {
+  font-size: 0.76rem;
+  color: #8A4A3A;
+  line-height: 1.75;
+  padding: 0.2rem 0 0.2rem 1rem;
+  position: relative;
+}
+
+.form-errors-list li::before {
+  content: '\25AA';
+  position: absolute;
+  left: 0;
+  top: 0.3rem;
+  color: #C47865;
+  font-size: 0.6rem;
+}
+
+/* エラー項目のハイライト */
+.form-group.has-error input:not([type="radio"]):not([type="checkbox"]),
+.form-group.has-error select,
+.form-group.has-error textarea {
+  border-color: #C47865 !important;
+  background: #FDF7F5;
+}
+
+.form-group.has-error label {
+  color: #8A4A3A;
 }
 
 
