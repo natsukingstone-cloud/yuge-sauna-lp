@@ -10,7 +10,7 @@
      gas-code.gs をGoogle Apps Scriptにデプロイ後、
      発行されたURLをここに貼り付けてください
      ============================================================ */
-  var GAS_URL = 'https://script.google.com/macros/s/AKfycbz6q6C34ev7zgQyFmOsi_Fp0AsWRsFoBAmDXPncPBaCw5pQ2EwF4u5T9KYF0lqC4_J3Dg/exec';
+  var GAS_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
 
 
   document.addEventListener('DOMContentLoaded', init);
@@ -77,9 +77,13 @@
       document.querySelectorAll('.rv').forEach(function (el) {
         el.classList.add('on');
       });
+      document.querySelectorAll('.rv-img').forEach(function (el) {
+        el.classList.add('on');
+      });
       return;
     }
 
+    // 通常のリビール（一度だけ発火）
     var observer = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -94,6 +98,29 @@
 
     document.querySelectorAll('.rv').forEach(function (el) {
       observer.observe(el);
+    });
+
+    // 大きな画像用のフェードイン/アウト（常時監視）
+    var imgObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          // 画面内：フルで表示
+          entry.target.classList.add('on');
+          entry.target.classList.remove('leaving');
+        } else {
+          // 画面外：フェードアウト
+          if (entry.target.classList.contains('on')) {
+            entry.target.classList.add('leaving');
+          }
+        }
+      });
+    }, {
+      threshold: [0, 0.2, 0.5, 0.8, 1],
+      rootMargin: '0px'
+    });
+
+    document.querySelectorAll('.rv-img').forEach(function (el) {
+      imgObserver.observe(el);
     });
   }
 
