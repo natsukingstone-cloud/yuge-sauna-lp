@@ -10,7 +10,7 @@
      gas-code.gs をGoogle Apps Scriptにデプロイ後、
      発行されたURLをここに貼り付けてください
      ============================================================ */
-  var GAS_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbz6q6C34ev7zgQyFmOsi_Fp0AsWRsFoBAmDXPncPBaCw5pQ2EwF4u5T9KYF0lqC4_J3Dg/exec';
 
 
   document.addEventListener('DOMContentLoaded', init);
