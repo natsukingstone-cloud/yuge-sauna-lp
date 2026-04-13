@@ -1515,7 +1515,7 @@ footer {
     bottom: 1.2rem;
     width: auto;
     padding: 0;
-    gap: 0.5rem;
+    gap: 0.9rem;
     flex-direction: column;
     align-items: stretch;
   }
@@ -1523,9 +1523,9 @@ footer {
   .floating-reserve,
   .floating-line {
     flex: 0 0 auto;
-    min-width: 200px;
+    min-width: 220px;
     min-height: 56px;
-    padding: 0.8rem 1.3rem;
+    padding: 0.9rem 1.4rem;
     justify-content: flex-start;
   }
 }
