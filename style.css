@@ -57,6 +57,7 @@ html {
   scroll-behavior: smooth;
   font-size: 16px;
   overscroll-behavior-y: none;
+  overflow-x: clip;
 }
 
 body {
@@ -64,7 +65,7 @@ body {
   font-weight: 300;
   color: var(--ink);
   background: var(--white);
-  overflow-x: hidden;
+  overflow-x: clip;
   overscroll-behavior-y: none;
   -webkit-font-smoothing: antialiased;
   line-height: 1.8;
@@ -1521,7 +1522,7 @@ body.is-modal-open .floating-ctas {
     left: auto;
     right: 1.2rem;
     bottom: 1.2rem;
-    width: 240px;
+    width: 260px;
     padding: 0;
     gap: 0.7rem;
     flex-direction: column;
@@ -1534,10 +1535,17 @@ body.is-modal-open .floating-ctas {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    min-height: 60px;
-    padding: 0.9rem 1.4rem;
+    min-height: 62px;
+    padding: 0.9rem 1.3rem;
     justify-content: flex-start;
     box-sizing: border-box;
+  }
+
+  /* PCではアイコンサイズと余白を統一 */
+  .fr-icon,
+  .fl-icon {
+    width: 22px;
+    height: 22px;
   }
 }
 
@@ -1909,6 +1917,15 @@ body.is-modal-open {
 /* 画像内の<img>タグへの適用 */
 .rv-img img {
   transition: inherit;
+}
+
+/* SP左右ブレ防止: 画像コンテナにoverflow制御 */
+.img-break,
+.ed-img,
+.hero-media,
+.final-cta-bg {
+  overflow: hidden;
+  max-width: 100%;
 }
 
 
